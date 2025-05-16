@@ -1,5 +1,5 @@
 // import bcrypt from 'bcrypt';
-// import { User } from '../models/users';
+// import { User } from '../models/Users';
 // import sequelize from '../config/db';
 
 // const createSuperadmin = async () => {
@@ -10,7 +10,9 @@
 //             console.log('❌ Superadmin already exists.');
 //             process.exit(0);
 //         }
-//         const password: string | undefined = process.env.SUPERADMIN_PASSWORD;
+//         console.log(process.env.SUPERADMIN_PASSWORD);
+        
+//         const password: string | undefined = process.env.SUPERADMIN_PASSWORD || "Erkinovbek2004";
 //         if (!password) {
 //             console.error('❌ SUPERADMIN_PASSWORD environment variable is not set.');
 //             process.exit(1);

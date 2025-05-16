@@ -1,11 +1,12 @@
 
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/db';
+import { DataTypes, Model } from 'sequelize'
+import sequelize from '../config/db'
 
 export class User extends Model {
-    public login!: string;
-    public password!: string;
-    public role!: "admin" | "superadmin";
+    public login!: string
+    public password!: string
+    public role!: "admin" | "superadmin"
+  id: any
 }
 
 User.init({
@@ -30,6 +31,6 @@ User.init({
     sequelize,
     modelName: "auth",
     tableName: "users",
-    timestamps: true
+    timestamps: false
 })
 

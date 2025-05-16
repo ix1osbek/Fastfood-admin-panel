@@ -14,12 +14,5 @@ const sequelize = new Sequelize({
 })
 
 
-// sequelize.authenticate()
-// .then(() => {
-//     console.log("Connection database successfully.")
-// })
-// .catch((err) => {
-//     console.error("Unable to connect to the database:", err)
-// })
 
 export default sequelize
