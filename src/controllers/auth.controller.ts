@@ -13,7 +13,6 @@ export const createAdmin = async (req: Request, res: Response, next: NextFunctio
       return res.status(400).json({ message: "Bu login bilan foydalanuvchi allaqachon mavjud." });
     }
     const hashedPassword = await bcrypt.hash(password, 10)
-
     const newAdmin = await User.create({
       login,
       password: hashedPassword,
@@ -30,7 +29,26 @@ export const createAdmin = async (req: Request, res: Response, next: NextFunctio
   }
 }
 
+///////////////////// delete admin
 
+export const deleteAdmin = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "Foydalanuvchi topilmadi!" });
+    }
+
+    await user.destroy();
+
+    res.status(200).json({ message: "Admin muvaffaqiyatli o‘chirildi." });
+  } catch (error) {
+    console.error("❌ deleteAdmin xatolik:", error);
+    res.status(500).json({ message: "Server xatosi." });
+  }
+};
 
 //////////////// login 
 
