@@ -50,6 +50,21 @@ export const deleteAdmin = async (req: Request, res: Response) => {
   }
 };
 
+
+/////////// get all admins
+export const getAllAdmins = async (req: Request, res: Response) => {
+  try {
+    const admins = await User.findAll({
+      where: { role: 'admin' },
+      attributes: ['id', 'login', 'role'],
+    });
+
+    res.status(200).json(admins);
+  } catch (error) {
+    console.error('getAllAdmins xatolik:', error);
+    res.status(500).json({ message: 'Server xatosi.' });
+  }
+};
 //////////////// login 
 
 
