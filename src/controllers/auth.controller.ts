@@ -85,7 +85,37 @@ export const getAdminById = async (req: Request, res: Response) => {
     console.error('getAdminById xatolik:', error);
     res.status(500).json({ message: 'Server xatosi.' });
   }
-};
+}
+
+/////    update admin
+export const updateAdmin = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { login, password } = req.body;
+
+    const admin = await User.findByPk(id);
+
+    if (!admin) {
+      return res.status(404).json({ message: 'Admin topilmadi' });
+    }
+
+    if (login) {
+      admin.login = login;
+    }
+
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      admin.password = hashedPassword;
+    }
+
+    await admin.save();
+
+    res.status(200).json({ message: 'Admin muvaffaqiyatli yangilandi', admin: { id: admin.id, login: admin.login} });
+  } catch (error) {
+    console.error('updateAdmin xatolik:', error);
+    res.status(500).json({ message: 'Server xatosi.' })
+  }
+}
 //////////////// login 
 
 
