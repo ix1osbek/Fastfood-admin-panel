@@ -2,7 +2,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { User } from '../models/Users'
 import bcrypt from 'bcrypt'
-import { generateToken } from '../utils/jwt'
+import { generateToken , generateRefreshToken} from '../utils/jwt'
 
 export const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
   const { login, password } = req.body
@@ -118,35 +118,68 @@ export const updateAdmin = async (req: Request, res: Response) => {
 }
 //////////////// login 
 
-
 export const login = async (req: Request, res: Response) => {
   try {
     const { login, password } = req.body;
 
     const user = await User.findOne({ where: { login } });
     if (!user) {
-      return res.status(401).json({ message: 'login yoki parol noto‘g‘ri' })
+      return res.status(401).json({ message: 'login yoki parol noto‘g‘ri' });
     }
 
-
-    const isMatch = await bcrypt.compare(password, user.password)
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'login yoki parol noto‘g‘ri' });
     }
-    const token = generateToken({
+
+    const accessToken = generateToken({
       id: user.id,
       login: user.login,
       role: user.role
-    })
+    });
+
+    const refreshToken = generateRefreshToken({
+      id: user.id,
+      login: user.login,
+      role: user.role
+    });
+
+    // Refresh tokenni cookie ga yozamiz
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,        // faqat server o'qiy oladi
+      secure: false,         // HTTPS bo'lsa true qilasiz
+      sameSite: 'strict',    // CSRF himoyasi uchun
+      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 kun
+    });
+
     res.status(200).json({
       message: 'Muvaffaqiyatli tizimga kirildi',
-      token,
+      accessToken,
       user: {
         login: user.login
-      },
-    })
+      }
+    });
 
   } catch (error) {
     console.error('Login error:', error);
+    res.status(500).json({ message: 'Serverda xatolik yuz berdi' })
+  }
+};
+
+
+  ////////// logout
+export const logout = (req: Request, res: Response) => {
+  try {
+    // refresh token saqlangan cookie ni o'chirish
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: false,       // HTTPS bo'lsa true qilinadi
+      sameSite: 'strict',
+    });
+
+    res.status(200).json({ message: 'Muvaffaqiyatli tizimdan chiqildi' });
+  } catch (error) {
+    console.error('Logout error:', error);
     res.status(500).json({ message: 'Serverda xatolik yuz berdi' });
-  }}
+  }
+};

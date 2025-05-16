@@ -1,6 +1,6 @@
 
 import { RequestHandler, Router } from 'express';
-import { createAdmin, deleteAdmin, getAdminById, getAllAdmins, login, updateAdmin } from '../controllers/auth.controller';
+import { createAdmin, deleteAdmin, getAdminById, getAllAdmins, login, logout, updateAdmin } from '../controllers/auth.controller';
 import { checkRole } from '../middlewares/roleMiddleware';
 import { authenticate } from '../middlewares/authMiddleware';
 
@@ -11,5 +11,5 @@ authRouter.get('/all_admins',authenticate as RequestHandler, checkRole("superadm
 authRouter.get('/admin/:id',authenticate as RequestHandler, checkRole("superadmin") as RequestHandler, getAdminById as RequestHandler)
 authRouter.put('/update_admin/:id',authenticate as RequestHandler, checkRole("superadmin") as RequestHandler, updateAdmin as RequestHandler)
 authRouter.post("/login", login as RequestHandler)
-
+authRouter.post("/logout" , authenticate as RequestHandler , logout as RequestHandler)
 export default authRouter

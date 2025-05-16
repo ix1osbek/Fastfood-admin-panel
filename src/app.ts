@@ -3,6 +3,7 @@ import cors from "cors"
 import dotenv from "dotenv"
 import sequelize from "./config/db"
 import authRouter from "./routes/auth.routes"
+import cookieParser = require("cookie-parser")
 // import createSuperadmin from "./utils/create.superadmin"
 dotenv.config()
 
@@ -13,6 +14,7 @@ app.use(cors({
     origin: process.env.CORS_ORIGIN || "*",
     credentials: true
 })) 
+app.use(cookieParser())
 // createSuperadmin()
 app.use("/auth", authRouter)
 
