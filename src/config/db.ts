@@ -1,4 +1,4 @@
-import { Sequelize, Model, DataTypes } from "sequelize"
+import { Sequelize} from "sequelize"
 import dotenv from "dotenv"
 dotenv.config()
 
