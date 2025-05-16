@@ -1,8 +1,8 @@
 
-import { RequestHandler, Router } from 'express';
-import { createAdmin, deleteAdmin, getAdminById, getAllAdmins, login, logout, updateAdmin } from '../controllers/auth.controller';
-import { checkRole } from '../middlewares/roleMiddleware';
-import { authenticate } from '../middlewares/authMiddleware';
+import { RequestHandler, Router } from 'express'
+import { createAdmin, deleteAdmin, getAdminById, getAllAdmins, login, logout, updateAdmin } from '../controllers/auth.controller'
+import { checkRole } from '../middlewares/roleMiddleware'
+import { authenticate } from '../middlewares/authMiddleware'
 
 const authRouter: Router = Router()
 authRouter.post('/create_admin',authenticate as RequestHandler, checkRole("superadmin") as RequestHandler, createAdmin as RequestHandler)

@@ -1,19 +1,19 @@
-// middlewares/checkRole.ts
-import { Request, Response, NextFunction } from "express";
+
+import { Request, Response, NextFunction } from "express"
 
 export function checkRole(...allowedRoles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user; // req.user — JWT token decode qilingandan keyin o’rnatiladi
+    const user = req.user
 
     if (!user) {
-      return res.status(401).json({ message: "Foydalanuvchi topilmadi" });
+      return res.status(401).json({ message: "Foydalanuvchi topilmadi" })
     }
 
     if (!allowedRoles.includes(user.role)) {
-      return res.status(403).json({ message: "Ruxsat yo'q" });
+      return res.status(403).json({ message: "Siz uchun bu qismda ruxsat yo'q!" })
     }
 
-    next();
-  };
+    next()
+  }
 }
 
