@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { Client } from '../models/client'
-import {ApiError} from "../utils/apiError"
+import { ApiError } from "../utils/apiError"
 
 
 
@@ -33,6 +33,21 @@ export const addClient = async (req: Request, res: Response, next: NextFunction)
     }
 }
 
+/////// get all clients
+export const getAllClients = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const clients = await Client.findAll({
+            attributes: ['id', 'name', 'surname', 'phone'],
+        })
 
+        if (!clients.length) {
+            return next(new ApiError(404, "Hozircha mijozlar mavjud emas!"))
+        }
+
+        return res.status(200).json(clients)
+    } catch (error) {
+        next(error)
+    }
+}
 
 
