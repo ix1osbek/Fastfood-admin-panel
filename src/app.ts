@@ -7,13 +7,13 @@ import clientRouter from "./routes/client.routes"
 import cookieParser = require("cookie-parser")
 import { errorHandler } from './middlewares/error.middleware'
 import { notFound } from './middlewares/notFound.middleware'
+import categoryRouter from "./routes/category.routes"
 
 //////////// swagger uchun
 
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs'
-import path from 'path';
-
+import path from 'path'
 // import createSuperadmin from "./utils/create.superadmin"
 dotenv.config()
 
@@ -29,6 +29,7 @@ app.use(cookieParser())
 const swaggerDocument = YAML.load(path.join(__dirname, 'swagger/auth.swagger.yaml'))
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/auth", authRouter)
+app.use(categoryRouter)
 app.use(clientRouter)
 app.use(notFound)
 app.use(errorHandler)
