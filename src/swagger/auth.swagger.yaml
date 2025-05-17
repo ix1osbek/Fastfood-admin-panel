@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: Auth API
-  description: fast food CRM website
+  title: Fastfood CRM website
+  description: With this project, you can systematically control fast food restaurants through CRM.
   version: 1.0.0
 components:
   securitySchemes:
@@ -23,12 +23,43 @@ components:
           type: string
           enum: [admin, superadmin]
           example: admin
-    Error:
+      required:
+        - id
+        - login
+        - role
+    CreateAdminRequest:
       type: object
       properties:
-        message:
+        login:
           type: string
-          example: Error message
+          example: newadmin
+        password:
+          type: string
+          example: Password123
+      required:
+        - login
+        - password
+    UpdateAdminRequest:
+      type: object
+      properties:
+        login:
+          type: string
+          example: updatedadmin
+        password:
+          type: string
+          example: NewPassword123
+    LoginRequest:
+      type: object
+      properties:
+        login:
+          type: string
+          example: admin1
+        password:
+          type: string
+          example: Password123
+      required:
+        - login
+        - password
     LoginResponse:
       type: object
       properties:
@@ -44,12 +75,23 @@ components:
             login:
               type: string
               example: admin1
+      required:
+        - message
+        - accessToken
+        - user
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Xato xabar
+      required:
+        - message
 paths:
   /auth/create_admin:
     post:
-      summary: Create a new admin
-      tags:
-        - Auth
+      summary: Yangi admin yaratish
+      description: Superadmin roli orqali yangi admin foydalanuvchi yaratadi
       security:
         - BearerAuth: []
       requestBody:
@@ -57,20 +99,10 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - login
-                - password
-              properties:
-                login:
-                  type: string
-                  example: newadmin
-                password:
-                  type: string
-                  example: password123
+              $ref: '#/components/schemas/CreateAdminRequest'
       responses:
         '201':
-          description: Admin created successfully
+          description: Admin muvaffaqiyatli yaratildi
           content:
             application/json:
               schema:
@@ -78,38 +110,51 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Admin muvaffaqiyatli yaratildi
+                    example: Admin muvaffaqiyatli yaratildi!
                   admin:
-                    $ref: '#/components/schemas/User'
+                    type: object
+                    properties:
+                      login:
+                        type: string
+                        example: newadmin
+                      role:
+                        type: string
+                        example: admin
         '400':
-          description: User already exists
+          description: Login allaqachon mavjud
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Server error
+        '401':
+          description: Autentifikatsiya xatosi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Superadmin roli talab qilinadi
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /auth/delete_admin/{id}:
     delete:
-      summary: Delete an admin by ID
-      tags:
-        - Auth
+      summary: Adminni o'chirish
+      description: Superadmin roli orqali admin foydalanuvchini o'chiradi
       security:
         - BearerAuth: []
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
             type: integer
             example: 1
+          description: O'chiriladigan adminning IDsi
       responses:
         '200':
-          description: Admin deleted successfully
+          description: Admin muvaffaqiyatli o'chirildi
           content:
             application/json:
               schema:
@@ -117,104 +162,114 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Admin muvaffaqiyatli o‘chirildi
-        '404':
-          description: Admin not found
+                    example: Admin muvaffaqiyatli o'chirildi!
+        '401':
+          description: Autentifikatsiya xatosi
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Server error
+        '403':
+          description: Superadmin roli talab qilinadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Admin topilmadi
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /auth/all_admins:
     get:
-      summary: Get all admins
-      tags:
-        - Auth
+      summary: Barcha adminlarni olish
+      description: Superadmin roli orqali barcha admin foydalanuvchilar ro'yxatini oladi
       security:
         - BearerAuth: []
       responses:
         '200':
-          description: List of admins
+          description: Adminlar ro'yxati
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
-        '500':
-          description: Server error
+        '401':
+          description: Autentifikatsiya xatosi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Superadmin roli talab qilinadi
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /auth/admin/{id}:
     get:
-      summary: Get admin by ID
-      tags:
-        - Auth
+      summary: Adminni ID bo'yicha olish
+      description: Superadmin roli orqali ma'lum bir admin foydalanuvchini oladi
       security:
         - BearerAuth: []
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
             type: integer
             example: 1
+          description: Adminning IDsi
       responses:
         '200':
-          description: Admin details
+          description: Admin ma'lumotlari
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        '404':
-          description: Admin not found
+        '401':
+          description: Autentifikatsiya xatosi
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Server error
+        '403':
+          description: Superadmin roli talab qilinadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Admin topilmadi
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /auth/update_admin/{id}:
     put:
-      summary: Update admin details
-      tags:
-        - Auth
+      summary: Adminni yangilash
+      description: Superadmin roli orqali admin foydalanuvchi ma'lumotlarini yangilaydi
       security:
         - BearerAuth: []
       parameters:
-        - name: id
-          in: path
+        - in: path
+          name: id
           required: true
           schema:
             type: integer
             example: 1
+          description: Yangilanadigan adminning IDsi
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                login:
-                  type: string
-                  example: updatedadmin
-                password:
-                  type: string
-                  example: newpassword123
+              $ref: '#/components/schemas/UpdateAdminRequest'
       responses:
         '200':
-          description: Admin updated successfully
+          description: Admin muvaffaqiyatli yangilandi
           content:
             application/json:
               schema:
@@ -224,69 +279,64 @@ paths:
                     type: string
                     example: Admin muvaffaqiyatli yangilandi
                   admin:
-                    $ref: '#/components/schemas/User'
-        '404':
-          description: Admin not found
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      login:
+                        type: string
+                        example: updatedadmin
+        '401':
+          description: Autentifikatsiya xatosi
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        '500':
-          description: Server error
+        '403':
+          description: Superadmin roli talab qilinadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Admin topilmadi
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /auth/login:
     post:
-      summary: User login
-      tags:
-        - Auth
+      summary: Tizimga kirish
+      description: Foydalanuvchi login va parol orqali tizimga kiradi va JWT token oladi
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - login
-                - password
-              properties:
-                login:
-                  type: string
-                  example: admin1
-                password:
-                  type: string
-                  example: password123
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Login successful
+          description: Muvaffaqiyatli tizimga kirildi
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/LoginResponse'
         '401':
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '500':
-          description: Server error
+          description: Login yoki parol xato
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /auth/logout:
     post:
-      summary: User logout
-      tags:
-        - Auth
+      summary: Tizimdan chiqish
+      description: Foydalanuvchi tizimdan chiqadi va refreshToken o'chiriladi
       security:
         - BearerAuth: []
       responses:
         '200':
-          description: Logout successful
+          description: Muvaffaqiyatli tizimdan chiqildi
           content:
             application/json:
               schema:
@@ -295,8 +345,8 @@ paths:
                   message:
                     type: string
                     example: Muvaffaqiyatli tizimdan chiqildi
-        '500':
-          description: Server error
+        '401':
+          description: Autentifikatsiya xatosi
           content:
             application/json:
               schema:
