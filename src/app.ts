@@ -4,6 +4,8 @@ import dotenv from "dotenv"
 import sequelize from "./config/db"
 import authRouter from "./routes/auth.routes"
 import cookieParser = require("cookie-parser")
+import { errorHandler } from './middlewares/error.middleware'
+import { notFound } from './middlewares/notFound.middleware'
 
 //////////// swagger uchun
 
@@ -26,6 +28,9 @@ app.use(cookieParser())
 const swaggerDocument = YAML.load(path.join(__dirname, 'swagger/auth.swagger.yaml'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/auth", authRouter)
+app.use(notFound)
+app.use(errorHandler)
+
 
 sequelize.authenticate()
     .then(() => {

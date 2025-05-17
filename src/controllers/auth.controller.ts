@@ -2,7 +2,9 @@
 import { NextFunction, Request, Response } from 'express'
 import { User } from '../models/Users'
 import bcrypt from 'bcrypt'
-import { generateToken , generateRefreshToken} from '../utils/jwt'
+import { generateToken, generateRefreshToken } from '../utils/jwt'
+import { ApiError } from '../utils/apiError'
+
 
 export const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
   const { login, password } = req.body
@@ -10,7 +12,7 @@ export const createAdmin = async (req: Request, res: Response, next: NextFunctio
     const existingUser = await User.findOne({ where: { login } })
 
     if (existingUser) {
-      return res.status(400).json({ message: "Bu login bilan foydalanuvchi allaqachon mavjud." })
+      return next(new ApiError(400, "Bu login allaqachon mavjud. Iltimos boshqa logindan foydalaning!"))
     }
     const hashedPassword = await bcrypt.hash(password, 10)
     const newAdmin = await User.create({
@@ -20,39 +22,37 @@ export const createAdmin = async (req: Request, res: Response, next: NextFunctio
     })
 
     return res.status(201).json({
-      message: "Admin muvaffaqiyatli yaratildi",
+      message: "Admin muvaffaqiyatli yaratildi!",
       admin: { login: newAdmin.login, role: newAdmin.role },
     })
   } catch (error: any) {
-    console.error("❌ Error creating admin:", error)
     next(error)
   }
 }
 
 ///////////////////// delete admin
 
-export const deleteAdmin = async (req: Request, res: Response) => {
+export const deleteAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
-    
+
     const user = await User.findByPk(id)
 
     if (!user) {
-      return res.status(404).json({ message: "Foydalanuvchi topilmadi!" })
+      return next(new ApiError(404, "Admin topilmadi!"))
     }
 
     await user.destroy()
 
-    res.status(200).json({ message: "Admin muvaffaqiyatli o‘chirildi." })
+    res.status(200).json({ message: "Admin muvaffaqiyatli o'chirildi!" })
   } catch (error) {
-    console.error("❌ deleteAdmin xatolik:", error)
-    res.status(500).json({ message: "Server xatosi." })
+    next(error)
   }
 }
 
 
 /////////// get all admins
-export const getAllAdmins = async (req: Request, res: Response) => {
+export const getAllAdmins = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const admins = await User.findAll({
       where: { role: 'admin' },
@@ -61,14 +61,13 @@ export const getAllAdmins = async (req: Request, res: Response) => {
 
     res.status(200).json(admins)
   } catch (error) {
-    console.error('getAllAdmins xatolik:', error)
-    res.status(500).json({ message: 'Server xatosi.' })
+    next(error)
   }
 }
 
 
 ///////////////////// get admin by id
-export const getAdminById = async (req: Request, res: Response) => {
+export const getAdminById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
 
@@ -77,18 +76,16 @@ export const getAdminById = async (req: Request, res: Response) => {
     })
 
     if (!admin) {
-      return res.status(404).json({ message: 'Admin topilmadi' })
+      return next(new ApiError(404, "Admin topilmadi!"))
     }
-
     res.status(200).json(admin)
   } catch (error) {
-    console.error('getAdminById xatolik:', error)
-    res.status(500).json({ message: 'Server xatosi.' })
+    next(error)
   }
 }
 
 /////    update admin
-export const updateAdmin = async (req: Request, res: Response) => {
+export const updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = req.params
     const { login, password } = req.body
@@ -96,7 +93,7 @@ export const updateAdmin = async (req: Request, res: Response) => {
     const admin = await User.findByPk(id)
 
     if (!admin) {
-      return res.status(404).json({ message: 'Admin topilmadi' })
+      return next(new ApiError(404, "Admin topilmadi!"))
     }
 
     if (login) {
@@ -109,27 +106,25 @@ export const updateAdmin = async (req: Request, res: Response) => {
     }
 
     await admin.save()
-
-    res.status(200).json({ message: 'Admin muvaffaqiyatli yangilandi', admin: { id: admin.id, login: admin.login} })
+    res.status(200).json({ message: 'Admin muvaffaqiyatli yangilandi', admin: { id: admin.id, login: admin.login } })
   } catch (error) {
-    console.error('updateAdmin xatolik:', error)
-    res.status(500).json({ message: 'Server xatosi.' })
+    next(error)
   }
 }
 //////////////// login 
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { login, password } = req.body
 
     const user = await User.findOne({ where: { login } })
     if (!user) {
-      return res.status(401).json({ message: 'login yoki parol noto‘g‘ri' })
+      return next(new ApiError(401, 'login yoki parol xato!'))
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
-      return res.status(401).json({ message: 'login yoki parol noto‘g‘ri' })
+      return next(new ApiError(401, 'login yoki parol xato!'))
     }
 
     const accessToken = generateToken({
@@ -143,13 +138,11 @@ export const login = async (req: Request, res: Response) => {
       login: user.login,
       role: user.role
     })
-
-    // Refresh tokenni cookie ga yozamiz
     res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,        // faqat server o'qiy oladi
-      secure: false,         // HTTPS bo'lsa true qilasiz
-      sameSite: 'strict',    // CSRF himoyasi uchun
-      maxAge: 30 * 24 * 60 * 60 * 1000 // 30 kun
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000
     })
 
     res.status(200).json({
@@ -161,24 +154,22 @@ export const login = async (req: Request, res: Response) => {
     })
 
   } catch (error) {
-    console.error('Login error:', error)
-    res.status(500).json({ message: 'Serverda xatolik yuz berdi' })
+    next(error)
   }
 }
 
 
-  ////////// logout
-export const logout = (req: Request, res: Response) => {
+////////// logout
+export const logout = (req: Request, res: Response, next: NextFunction) => {
   try {
     res.clearCookie('refreshToken', {
       httpOnly: true,
-      secure: false,      
+      secure: false,
       sameSite: 'strict',
     })
 
     res.status(200).json({ message: 'Muvaffaqiyatli tizimdan chiqildi' })
   } catch (error) {
-    console.error('Logout error:', error)
-    res.status(500).json({ message: 'Serverda xatolik yuz berdi' })
+    next(error)
   }
 }
