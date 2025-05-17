@@ -1,0 +1,293 @@
+openapi: 3.0.3
+info:
+  title: Client API
+  description: Node.js + Express.js + TypeScript + PostgreSQL loyihasi uchun mijozlarni boshqarish API
+  version: 1.0.0
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Ali
+        surname:
+          type: string
+          example: Valiev
+        phone:
+          type: string
+          example: +998901234567
+      required:
+        - id
+        - name
+        - surname
+        - phone
+    CreateClientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Ali
+          minLength: 2
+          maxLength: 30
+        surname:
+          type: string
+          example: Valiev
+          minLength: 2
+          maxLength: 30
+        phone:
+          type: string
+          example: +998901234567
+          pattern: ^\+998\d{9}$
+      required:
+        - name
+        - surname
+        - phone
+    UpdateClientRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Ali
+          minLength: 2
+          maxLength: 30
+        surname:
+          type: string
+          example: Valiev
+          minLength: 2
+          maxLength: 30
+        phone:
+          type: string
+          example: +998901234567
+          pattern: ^\+998\d{9}$
+      required:
+        - name
+        - surname
+        - phone
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Xato xabar
+      required:
+        - message
+paths:
+  /clients/add_client:
+    post:
+      summary: Yangi mijoz qo'shish
+      description: Admin yoki superadmin roli orqali yangi mijoz qo'shadi
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClientRequest'
+      responses:
+        '201':
+          description: Mijoz muvaffaqiyatli yaratildi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Mijoz muvaffaqiyatli yaratildi!
+                  client:
+                    $ref: '#/components/schemas/Client'
+        '400':
+          description: Telefon raqami allaqachon mavjud yoki noto'g'ri ma'lumot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Autentifikatsiya xatosi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Admin yoki superadmin roli talab qilinadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /clients:
+    get:
+      summary: Barcha mijozlarni olish
+      description: Admin yoki superadmin roli orqali barcha mijozlar ro'yxatini oladi
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Mijozlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Client'
+        '401':
+          description: Autentifikatsiya xatosi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Admin yoki superadmin roli talab qilinadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Hozircha mijozlar mavjud emas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /clients/by_id/{id}:
+    get:
+      summary: Mijozni ID bo'yicha olish
+      description: Admin yoki superadmin roli orqali ma'lum bir mijoz ma'lumotlarini oladi
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Mijozning IDsi
+      responses:
+        '200':
+          description: Mijoz ma'lumotlari
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Client'
+        '401':
+          description: Autentifikatsiya xatosi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Admin yoki superadmin roli talab qilinadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Mijoz topilmadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /clients/update_client/{id}:
+    put:
+      summary: Mijozni yangilash
+      description: Admin yoki superadmin roli orqali mijoz ma'lumotlarini yangilaydi
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: Yangilanadigan mijozning IDsi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateClientRequest'
+      responses:
+        '200':
+          description: Mijoz muvaffaqiyatli yangilandi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Mijoz muvaffaqiyatli yangilandi!
+                  client:
+                    $ref: '#/components/schemas/Client'
+        '401':
+          description: Autentifikatsiya xatosi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Admin yoki superadmin roli talab qilinadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Mijoz topilmadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /clients/delete_client/{id}:
+    delete:
+      summary: Mijozni o'chirish
+      description: Admin yoki superadmin roli orqali mijozni o'chiradi
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: O'chiriladigan mijozning IDsi
+      responses:
+        '200':
+          description: Mijoz muvaffaqiyatli o'chirildi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Mijoz muvaffaqiyatli o'chirildi!"
+
+        '401':
+          description: Autentifikatsiya xatosi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Admin yoki superadmin roli talab qilinadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Mijoz topilmadi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

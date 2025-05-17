@@ -22,7 +22,7 @@ User.init({
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false    
     },
     role: {
         type: DataTypes.ENUM("admin", "superadmin"),

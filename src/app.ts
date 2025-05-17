@@ -26,7 +26,7 @@ app.use(cors({
 }))
 app.use(cookieParser())
 // createSuperadmin()
-const swaggerDocument = YAML.load(path.join(__dirname, 'swagger/auth.swagger.yaml'));
+const swaggerDocument = YAML.load(path.join(__dirname, 'swagger/auth.swagger.yaml'))
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/auth", authRouter)
 app.use(clientRouter)

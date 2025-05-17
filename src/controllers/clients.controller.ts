@@ -50,4 +50,70 @@ export const getAllClients = async (req: Request, res: Response, next: NextFunct
     }
 }
 
+/////////////// get client by id
+export const getClientById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
 
+        const client = await Client.findByPk(id, {
+            attributes: ['id', 'name', 'surname', 'phone'],
+        })
+
+        if (!client) {
+            return next(new ApiError(404, "Mijoz topilmadi!"))
+        }
+
+        return res.status(200).json(client)
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+/////////////// update client
+export const updateClient = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+        const { name, surname, phone } = req.body
+
+        const client = await Client.findByPk(id)
+
+        if (!client) {
+            return next(new ApiError(404, "Mijoz topilmadi!"))
+        }
+
+        client.name = name
+        client.surname = surname
+        client.phone = phone
+
+        await client.save()
+
+        return res.status(200).json({
+            message: "Mijoz muvaffaqiyatli yangilandi!",
+            client: { id: client.id, name: client.name, surname: client.surname, phone: client.phone },
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+
+////////////// delete client
+
+export const deleteClient = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+
+        const client = await Client.findByPk(id)
+
+        if (!client) {
+            return next(new ApiError(404, "Mijoz topilmadi!"))
+        }
+        await client.destroy()
+
+        return res.status(200).json({ message: "Mijoz muvaffaqiyatli o'chirildi!" })
+    } catch (error) {
+        next(error)
+    }
+}
