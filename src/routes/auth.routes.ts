@@ -40,37 +40,37 @@ const authRouter: Router = Router()
 
 authRouter.post(
     '/create_admin',
-    authenticate as RequestHandler,
-    checkRole('superadmin') as RequestHandler,
+    authenticate,
+    checkRole('superadmin'),
     validateBody(createAdminSchema),
     createAdmin as RequestHandler
 )
 
 authRouter.delete(
     '/delete_admin/:id',
-    authenticate as RequestHandler,
-    checkRole('superadmin') as RequestHandler,
+    authenticate ,
+    checkRole('superadmin') ,
     deleteAdmin as RequestHandler
 )
 
 authRouter.get(
     '/all_admins',
-    authenticate as RequestHandler,
-    checkRole('superadmin') as RequestHandler,
+    authenticate ,
+    checkRole('superadmin') ,
     getAllAdmins as RequestHandler
 )
 
 authRouter.get(
     '/admin/:id',
-    authenticate as RequestHandler,
-    checkRole('superadmin') as RequestHandler,
+    authenticate ,
+    checkRole('superadmin') ,
     getAdminById as RequestHandler
 )
 
 authRouter.put(
     '/update_admin/:id',
-    authenticate as RequestHandler,
-    checkRole('superadmin') as RequestHandler,
+    authenticate ,
+    checkRole('superadmin') ,
     validateBody(updateAdminSchema),
     updateAdmin as RequestHandler
 )
@@ -83,7 +83,7 @@ authRouter.post(
 
 authRouter.post(
     '/logout',
-    authenticate as RequestHandler,
+    authenticate,
     logout as RequestHandler
 )
 

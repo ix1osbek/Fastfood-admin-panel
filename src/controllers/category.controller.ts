@@ -10,7 +10,7 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
 
         if (!req.file) {
             return next(new ApiError(400, "Rasm yuklanishi majburiy!"));
-        }   
+        }
 
         const imgUrl = req.file.path
 
@@ -36,4 +36,101 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
     } catch (error) {
         next(error)
     }
-};
+}
+
+
+///////// get all categories
+export const getAllCategories = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const categories = await Category.findAll()
+        if (categories.length === 0) {
+            return next(new ApiError(404, "Kategoriya topilmadi!"))
+        }
+        return res.status(200).json({
+            message: "Barcha kategoriyalar",
+            categories
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+///////// get category by id
+export const getCategoryById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+        const category = await Category.findByPk(id)
+        if (!category) {
+            return next(new ApiError(404, "Kategoriya topilmadi!"))
+        }
+        return res.status(200).json({
+            category
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+
+///////// update category
+export const updateCategory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+        const { title } = req.body
+        if (!req.file) {
+            return next(new ApiError(400, "Rasm yuklashda xatolik!"))
+        }
+
+        const imgUrl = req.file.path
+
+        const category = await Category.findByPk(id)
+        if (!category) {
+            return next(new ApiError(404, "Kategoriya topilmadi!"))
+        }
+
+        await Category.update({
+            title,
+            img: imgUrl
+        }, {
+            where: {
+                id
+            }
+        })
+
+        return res.status(200).json({
+            message: "Kategoriya muvaffaqiyatli yangilandi!",
+            category: {
+                id,
+                title,
+                img: imgUrl
+            }
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+
+/////////////   delete category
+export const deleteCategory = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { id } = req.params
+        const category = await Category.findByPk(id)
+        if (!category) {
+            return next(new ApiError(404, "Kategoriya topilmadi!"))
+        }
+        await Category.destroy({
+            where: {
+                id
+            }
+        })
+        return res.status(200).json({
+            message: "Kategoriya muvaffaqiyatli o'chirildi!"
+        })
+    } catch (error) {
+        next(error)
+    }
+}
