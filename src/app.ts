@@ -8,6 +8,7 @@ import cookieParser = require("cookie-parser")
 import { errorHandler } from './middlewares/error.middleware'
 import { notFound } from './middlewares/notFound.middleware'
 import categoryRouter from "./routes/category.routes"
+import productRouter from "./routes/Products.routes"
 
 //////////// swagger uchun
 
@@ -31,6 +32,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/auth", authRouter)
 app.use(categoryRouter)
 app.use(clientRouter)
+app.use(productRouter)
 app.use(notFound)
 app.use(errorHandler)
 
@@ -47,6 +49,7 @@ app.use(errorHandler)
 //     console.error('Xatolik:', err);
 //   });
 //////////////////////////
+
 
 sequelize.authenticate()
     .then(() => {
