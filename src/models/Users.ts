@@ -29,8 +29,8 @@ User.init({
     }
 }, {
     sequelize,
-    modelName: "auth",
+    modelName: "User",
     tableName: "users",
-    timestamps: false
+    timestamps: true
 })
 
