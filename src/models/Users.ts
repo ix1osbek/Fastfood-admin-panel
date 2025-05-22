@@ -6,7 +6,7 @@ export class User extends Model {
     public login!: string
     public password!: string
     public role!: "admin" | "superadmin"
-  id: any
+    id: any
 }
 
 User.init({
@@ -22,10 +22,16 @@ User.init({
     },
     password: {
         type: DataTypes.STRING,
-        allowNull: false    
+        allowNull: false
     },
     role: {
         type: DataTypes.ENUM("admin", "superadmin"),
+    },
+    createdAt: {
+        type: DataTypes.DATE
+    },
+    updatedAt: {
+        type: DataTypes.DATE
     }
 }, {
     sequelize,

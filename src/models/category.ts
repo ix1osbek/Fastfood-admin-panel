@@ -21,10 +21,16 @@ Category.init({
     img: {
         type: DataTypes.STRING,
         allowNull: false,
+    },
+       createdAt: {
+        type: DataTypes.DATE
+    },
+    updatedAt: {
+        type: DataTypes.DATE
     }
 }, {
     sequelize,
     modelName: "category",
     tableName: "categories",
-    timestamps: false
+    timestamps: true
 })

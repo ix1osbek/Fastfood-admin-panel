@@ -10,5 +10,4 @@ categoryRouter.get('/categories', authenticate, checkRole('admin', 'superadmin')
 categoryRouter.get('/categories/by_id/:id', authenticate, checkRole('admin', 'superadmin'), getCategoryById as RequestHandler)
 categoryRouter.put('/categories/update/:id', authenticate, checkRole('admin', 'superadmin'), parser.single("img"), updateCategory as RequestHandler)
 categoryRouter.delete("/categories/delete/:id", authenticate, checkRole('admin', 'superadmin'), deleteCategory as RequestHandler)
-
 export default categoryRouter

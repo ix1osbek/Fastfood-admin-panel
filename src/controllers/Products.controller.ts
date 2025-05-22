@@ -7,7 +7,7 @@ import { ApiError } from "../utils/apiError"
 ///// create product
 export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { title, price, description } = req.body
+        const { title, price, description, categoryId } = req.body
         if (!req.file) {
             return next(new ApiError(400, "Rasm yuklashda xatolik!"))
         }
@@ -16,7 +16,8 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
             title,
             price,
             description,
-            img: imgUrl
+            img: imgUrl,
+            categoryId
         })
 
         res.status(201).json({
@@ -26,7 +27,8 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
                 title: product.title,
                 price: product.price,
                 description: product.description,
-                img: product.img
+                img: product.img,
+                categoryId: product.categoryId
             }
         })
     } catch (error) {

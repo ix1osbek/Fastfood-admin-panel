@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { Category } from '../models/category'
 import { ApiError } from "../utils/apiError"
+import {Product} from "../models/Products"
 
 
 ///////// create category
@@ -60,7 +61,12 @@ export const getAllCategories = async (req: Request, res: Response, next: NextFu
 export const getCategoryById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { id } = req.params
-        const category = await Category.findByPk(id)
+        const category = await Category.findByPk(id,{
+            include: {
+                model: Product,
+                as: 'products'
+            }
+        })
         if (!category) {
             return next(new ApiError(404, "Kategoriya topilmadi!"))
         }

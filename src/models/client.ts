@@ -14,7 +14,7 @@ Client.init({
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
-        primaryKey: true,
+        primaryKey: true
     },
     name: {
         type: DataTypes.STRING(30),
@@ -29,8 +29,14 @@ Client.init({
         allowNull: false,
         unique: true,
         validate: {
-            is: /^\+998\d{9}$/i  
+            is: /^\+998\d{9}$/i
         }
+    },
+    createdAt: {
+        type: DataTypes.DATE
+    },
+    updatedAt: {
+        type: DataTypes.DATE
     }
 }, {
     sequelize,
