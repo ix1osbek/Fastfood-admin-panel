@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize'
 import sequelize from '../config/db'
+import { Order } from './order'
 
 
 export class Client extends Model {
@@ -32,6 +33,15 @@ Client.init({
             is: /^\+998\d{9}$/i
         }
     },
+    orderId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'orders',
+            key: 'id',
+        }, onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+    },
     createdAt: {
         type: DataTypes.DATE
     },
@@ -44,3 +54,6 @@ Client.init({
     tableName: "clients",
     timestamps: true
 })
+
+Order.hasMany(Client, { foreignKey: 'orderId', as: 'clients' })
+Client.belongsTo(Order, { foreignKey: 'orderId', as: 'order' })

@@ -20,5 +20,7 @@ export const createClientSchema = Joi.object({
             'string.empty': 'Telefon raqami bo‘sh bo‘lmasligi kerak',
             'string.pattern.base': 'Telefon raqami +998 bilan boshlanishi va 12 ta raqamdan iborat bo‘lishi kerak',
             'any.required': 'Telefon raqami kiritilishi shart'
-        })
+        }),
+
+    orderId: Joi.number().required()
 })
